@@ -3,255 +3,276 @@
 // 모든 요소가 갖추어지면 실행하도록 한다.
 // window.onload = function() {} 1번만 작성한다.
 window.onload = function () {
-  // 콤마 기능
-  function priceToString(price) {
-    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  }
-  // 펼침 목록들 보기 기능
+    AOS.init();
 
-  // 더보기 목록 기능
-  const menuBt = document.getElementById("menu-bt");
-  const menuList = document.getElementById("menu-list");
+    // 안내창
+    let body = document.querySelector("body");
+    let modal = document.querySelector(".modal-wrap");
+    modal.addEventListener("click", function () {
+        // modal.style.display = "none";
+        // fadeOut(modal)
+        anime({
+            targets: ".modal",
+            delay: 200,
+            duration: 500,
+            opacity: 0,
+            easing: "easeInOutQuad",
+            complete: function () {
+                modal.style.display = "none";
+                body.classList.add("active");
+            },
+        });
+    });
 
-  // 참여 목록 기능
-  const joinBt = document.getElementById("join-bt");
-  const joinList = document.getElementById("join-list");
+    // 콤마 기능
+    function priceToString(price) {
+        return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+    // 펼침 목록들 보기 기능
 
-  // 조합원센터 목록 기능
-  const centerBt = document.getElementById("center-bt");
-  const centerList = document.getElementById("center-list");
+    // 더보기 목록 기능
+    const menuBt = document.getElementById("menu-bt");
+    const menuList = document.getElementById("menu-list");
 
-  // 배열은 순서번호가 주어진다.
-  // 순서번호를 index 라고 호칭한다.
-  const toggleListArr = [menuList, joinList, centerList];
-  const toggleBtArr = [menuBt, joinBt, centerBt];
+    // 참여 목록 기능
+    const joinBt = document.getElementById("join-bt");
+    const joinList = document.getElementById("join-list");
 
-  // 바탕화면(html) 클릭시 펼침목록 모두!!!!!! 닫기
-  // 이벤트 명 다음에 할일(콜백함수-Hook 예로)
-  document.addEventListener("click", function () {
-    // for(let i = 0; i < toggleListArr.length; i++){
-    //   toggleListArr[i].style.display="none";
-    // }
+    // 조합원센터 목록 기능
+    const centerBt = document.getElementById("center-bt");
+    const centerList = document.getElementById("center-list");
 
+    // 배열은 순서번호가 주어진다.
+    // 순서번호를 index 라고 호칭한다.
+    const toggleListArr = [menuList, joinList, centerList];
+    const toggleBtArr = [menuBt, joinBt, centerBt];
+
+    // 바탕화면(html) 클릭시 펼침목록 모두!!!!!! 닫기
+    // 이벤트 명 다음에 할일(콜백함수-Hook 예로)
+    document.addEventListener("click", function () {
+        // for(let i = 0; i < toggleListArr.length; i++){
+        //   toggleListArr[i].style.display="none";
+        // }
+
+        toggleListArr.forEach(function (item) {
+            item.style.display = "none";
+        });
+        // 버튼 초기화
+        toggleBtArr.forEach(function (item) {
+            item.classList.remove("active");
+        });
+    });
+    // 목록 전체를 클릭해도 이벤트 전달을 막는다.
     toggleListArr.forEach(function (item) {
-      item.style.display = "none";
+        item.addEventListener("click", function (event) {
+            event.stopPropagation();
+        });
     });
-    // 버튼 초기화
-    toggleBtArr.forEach(function (item) {
-      item.classList.remove("active");
-    });
-  });
-  // 목록 전체를 클릭해도 이벤트 전달을 막는다.
-  toggleListArr.forEach(function (item) {
-    item.addEventListener("click", function (event) {
-      event.stopPropagation();
-    });
-  });
 
-  // 코드 블럭이 같은 기능이 반복이 된다.
-  // 기능을 만들어서 써야겠다고 판단했다.
-  //   추가 예정 기능 : 아이콘 바꾸기 추가필요
-  function listToggle(버튼, 목록) {
-    // 처음에는 목록을 보여주지 않는다.
-    // css 에서 처리하는 것이 좋아요.
-    목록.style.display = "none";
-
-    //  click 이벤트가 발생하면 함수(콜백함수)를 실행한다.
-    버튼.addEventListener("click", function (event) {
-      // 클릭되었다는 이벤트는 아래로 전달된다.
-      // 클릭된 이벤트를 아래로 전달하지 못하도록 막아준다.
-      event.stopPropagation();
-
-      // 일단 모든 버튼들을 그냥 막~~~ 초기화하자.
-      // 선택되었든 말든 그냥 막~~~  초기화해보자.
-      // for(let i = 0; i < toggleBtArr.length; i++){
-      //   toggleBtArr[i].classList.remove("active");
-      // }
-      toggleBtArr.forEach(function (item) {
-        item.classList.remove("active");
-      });
-
-      // 우리가 알고 있는 정보 버튼, 목록
-      // 버튼: menuBt
-      // 목록: menuList
-      // [menuList, joinList, centerList]
-      // display:none 을 적용할 나머지 목록들을 파악.
-      // 선택된 목록 이외의 목록을 저장하는 배열을 만든다.
-
-      // filter은 REACT 에서 엄~~청 많이 씀
-      // 이유는 복사본을 만들 수 있기 때문에
-      // 원본을 훼손하지 않기 때문에
-      // 조건을 걸어서 복사본을 만들 수 있기 때문에
-      // filter의 function은 조건을 걸어서 목록을 정리합니다.
-      console.log(목록);
-      const nowListId = 목록.getAttribute("id");
-
-      const hideArr = toggleListArr.filter(function (item) {
-        // console.log(item);
-        // 선택대상이 html 태그 라면 속성이 있다.
-
-        // 속성은 Attribute 라고 한다.
-        // <img src="a.jpg" class="go" id="ig">
-        // getAttribute("src")
-        // img 태그의 속성 class 를 알고 싶다면
-        //  getAttribute("class")
-        // img 태그의 속성 id 를 알고 싶다면
-        //  getAttribute("id")
-        let id = item.getAttribute("id");
-        console.log(id);
-        if (id !== nowListId) {
-          return this;
-        }
-      });
-
-      // 그리고, 새로 저장된 배열의 목록들은
-      console.log(hideArr);
-      // 모두 display:none 을 적용한다.
-
-      // hideArr[0].style.display = "none";
-      // hideArr[1].style.display = "none";
-
-      // for (let i = 0; i < hideArr.length; i++) {
-      //   hideArr[i].style.display = "none";
-      // }
-
-      hideArr.forEach(function (item) {
-        console.log(item);
-        item.style.display = "none";
-      });
-
-      // 누군지 알아요.
-      // type :  어떤 일(이벤트)가 일어났는지 종류를 말함
-      //   console.log(event.type);
-      // target : 이벤트를 발생시킨 HTML 요소
-      //   console.log(event.target);
-      // currentTarget :  이벤트를 발생시킨 HTML 요소
-      //   console.log(event.currentTarget);
-
-      //   이벤트를 발생시킨 HTML 태그 종류파악하기
-      console.log(this.tagName);
-      //   a 태그인 경우 href 가 작동한다.
-      //   a 태그의 기본 동작(웹브라우저 이동) 막는다.
-      if (this.tagName === "A") {
-        event.preventDefault();
-      }
-
-      // html 요소에 css 적용 사항을 파악한다.
-      const css = getComputedStyle(목록).display;
-      //   display값 비교한다.
-      if (css === "none") {
-        목록.style.display = "block";
-        // 클레스 강제로 추가하기
-        버튼.classList.add("active");
-      } else {
+    // 코드 블럭이 같은 기능이 반복이 된다.
+    // 기능을 만들어서 써야겠다고 판단했다.
+    //   추가 예정 기능 : 아이콘 바꾸기 추가필요
+    function listToggle(버튼, 목록) {
+        // 처음에는 목록을 보여주지 않는다.
+        // css 에서 처리하는 것이 좋아요.
         목록.style.display = "none";
-        // 클레스 강제로 삭제하기
-        버튼.classList.remove("active");
-      }
+
+        //  click 이벤트가 발생하면 함수(콜백함수)를 실행한다.
+        버튼.addEventListener("click", function (event) {
+            // 클릭되었다는 이벤트는 아래로 전달된다.
+            // 클릭된 이벤트를 아래로 전달하지 못하도록 막아준다.
+            event.stopPropagation();
+
+            // 일단 모든 버튼들을 그냥 막~~~ 초기화하자.
+            // 선택되었든 말든 그냥 막~~~  초기화해보자.
+            // for(let i = 0; i < toggleBtArr.length; i++){
+            //   toggleBtArr[i].classList.remove("active");
+            // }
+            toggleBtArr.forEach(function (item) {
+                item.classList.remove("active");
+            });
+
+            // 우리가 알고 있는 정보 버튼, 목록
+            // 버튼: menuBt
+            // 목록: menuList
+            // [menuList, joinList, centerList]
+            // display:none 을 적용할 나머지 목록들을 파악.
+            // 선택된 목록 이외의 목록을 저장하는 배열을 만든다.
+
+            // filter은 REACT 에서 엄~~청 많이 씀
+            // 이유는 복사본을 만들 수 있기 때문에
+            // 원본을 훼손하지 않기 때문에
+            // 조건을 걸어서 복사본을 만들 수 있기 때문에
+            // filter의 function은 조건을 걸어서 목록을 정리합니다.
+            console.log(목록);
+            const nowListId = 목록.getAttribute("id");
+
+            const hideArr = toggleListArr.filter(function (item) {
+                // console.log(item);
+                // 선택대상이 html 태그 라면 속성이 있다.
+
+                // 속성은 Attribute 라고 한다.
+                // <img src="a.jpg" class="go" id="ig">
+                // getAttribute("src")
+                // img 태그의 속성 class 를 알고 싶다면
+                //  getAttribute("class")
+                // img 태그의 속성 id 를 알고 싶다면
+                //  getAttribute("id")
+                let id = item.getAttribute("id");
+                console.log(id);
+                if (id !== nowListId) {
+                    return this;
+                }
+            });
+
+            // 그리고, 새로 저장된 배열의 목록들은
+            console.log(hideArr);
+            // 모두 display:none 을 적용한다.
+
+            // hideArr[0].style.display = "none";
+            // hideArr[1].style.display = "none";
+
+            // for (let i = 0; i < hideArr.length; i++) {
+            //   hideArr[i].style.display = "none";
+            // }
+
+            hideArr.forEach(function (item) {
+                console.log(item);
+                item.style.display = "none";
+            });
+
+            // 누군지 알아요.
+            // type :  어떤 일(이벤트)가 일어났는지 종류를 말함
+            //   console.log(event.type);
+            // target : 이벤트를 발생시킨 HTML 요소
+            //   console.log(event.target);
+            // currentTarget :  이벤트를 발생시킨 HTML 요소
+            //   console.log(event.currentTarget);
+
+            //   이벤트를 발생시킨 HTML 태그 종류파악하기
+            console.log(this.tagName);
+            //   a 태그인 경우 href 가 작동한다.
+            //   a 태그의 기본 동작(웹브라우저 이동) 막는다.
+            if (this.tagName === "A") {
+                event.preventDefault();
+            }
+
+            // html 요소에 css 적용 사항을 파악한다.
+            const css = getComputedStyle(목록).display;
+            //   display값 비교한다.
+            if (css === "none") {
+                목록.style.display = "block";
+                // 클레스 강제로 추가하기
+                버튼.classList.add("active");
+            } else {
+                목록.style.display = "none";
+                // 클레스 강제로 삭제하기
+                버튼.classList.remove("active");
+            }
+        });
+    }
+
+    listToggle(menuBt, menuList);
+    // toggleListArr[0] = menuList
+
+    listToggle(joinBt, joinList);
+    // toggleListArr[1] = joinList
+
+    listToggle(centerBt, centerList);
+    // toggleListArr[2] = centerList
+
+    // 위로가기 기능
+    // 위로가기 버튼 html 요소를 저장한다.
+    // css 를 활용한 선택법
+    // 만약 클래스를 활용해서 선택한다면
+    // querySelector (1개)
+    // querySelectorAll (여러개) : []
+    const fixTopBt = document.querySelector(".fix-top");
+    fixTopBt.addEventListener("click", function () {
+        // 스크롤바를 최상단으로 이동한다.
+        // window.scrollTo(0, 0);
+        // window.scrollTo({
+        //   top: 0,
+        //   behavior: "smooth",
+        // });
+
+        // GSAP 버전
+        // gsap.to(window, 0.4, {
+        //   scrollTo:0,
+        // });
+
+        // Anime.js 버전
+        const scrollElement =
+            window.document.scrollingElement ||
+            window.document.body ||
+            window.document.documentElement;
+        anime({
+            targets: scrollElement,
+            scrollTop: 0,
+            durarion: 1000,
+            easing: "easeInOutQuad",
+        });
     });
-  }
 
-  listToggle(menuBt, menuList);
-  // toggleListArr[0] = menuList
+    // 오늘의 상품 기능
+    const 제품 = {
+        이름: "콩콩크림빵",
+        단위: "1개",
+        가격: 1500,
+        태그: "인기",
+        사진: "a.jpg",
+        아이디: "0",
+        링크: "#",
+    };
+    let VISUAL_ARR;
+    let visualTag = document.getElementById("data-visual");
 
-  listToggle(joinBt, joinList);
-  // toggleListArr[1] = joinList
+    // 오늘의 상품 데이터 보관
+    let TODAY_GOOD;
+    let todayTag = document.getElementById("data-today");
+    let todayTag2 = document.getElementById("data-today2");
+    // console.log(todayTag);
 
-  listToggle(centerBt, centerList);
-  // toggleListArr[2] = centerList
+    let SALE_GOOD;
+    let saleTag = document.getElementById("data-sale");
 
-  // 위로가기 기능
-  // 위로가기 버튼 html 요소를 저장한다.
-  // css 를 활용한 선택법
-  // 만약 클래스를 활용해서 선택한다면
-  // querySelector (1개)
-  // querySelectorAll (여러개) : []
-  const fixTopBt = document.querySelector(".fix-top");
-  fixTopBt.addEventListener("click", function () {
-    // 스크롤바를 최상단으로 이동한다.
-    // window.scrollTo(0, 0);
-    // window.scrollTo({
-    //   top: 0,
-    //   behavior: "smooth",
-    // });
+    let NEW_GOOD;
+    let newTag = document.getElementById("data-new");
+    let newListTag = document.getElementById("data-new-list");
 
-    // GSAP 버전
-    // gsap.to(window, 0.4, {
-    //   scrollTo:0,
-    // });
+    let RECOMMEND_GOOD;
+    let recommendTag = document.getElementById("data-recommend");
 
-    // Anime.js 버전
-    const scrollElement =
-      window.document.scrollingElement ||
-      window.document.body ||
-      window.document.documentElement;
-    anime({
-      targets: scrollElement,
-      scrollTop: 0,
-      durarion: 1000,
-      easing: "easeInOutQuad",
-    });
-  });
+    let POPULAR_ICON;
+    let popularIconTag = document.getElementById("data-popular-icon");
 
-  // 오늘의 상품 기능
-  const 제품 = {
-    이름: "콩콩크림빵",
-    단위: "1개",
-    가격: 1500,
-    태그: "인기",
-    사진: "a.jpg",
-    아이디: "0",
-    링크: "#",
-  };
-  let VISUAL_ARR;
-  let visualTag = document.getElementById("data-visual");
+    let POPULAR_GOOD;
+    let popularshow = 1; // 목록중 0번을 보여준다.
+    let popularTag = document.getElementById("data-popular");
 
-  // 오늘의 상품 데이터 보관
-  let TODAY_GOOD;
-  let todayTag = document.getElementById("data-today");
-  let todayTag2 = document.getElementById("data-today2");
-  // console.log(todayTag);
+    let BRAND_ARR;
+    let brandTag = document.getElementById("data-brand");
 
-  let SALE_GOOD;
-  let saleTag = document.getElementById("data-sale");
+    let BANNER_ARR;
+    let bannerTag = document.getElementById("data-banner");
 
-  let NEW_GOOD;
-  let newTag = document.getElementById("data-new");
-  let newListTag = document.getElementById("data-new-list");
+    let REVIEW_ARR;
+    let reviewTag = document.getElementById("data-review");
 
-  let RECOMMEND_GOOD;
-  let recommendTag = document.getElementById("data-recommend");
+    let NOTICE_ARR;
+    let noticeTag = document.getElementById("data-notice");
 
-  let POPULAR_ICON;
-  let popularIconTag = document.getElementById("data-popular-icon");
+    let GOODNEWS_ARR;
+    let goodnewsTag = document.getElementById("data-goodnews");
 
-  let POPULAR_GOOD;
-  let popularshow = 1; // 목록중 0번을 보여준다.
-  let popularTag = document.getElementById("data-popular");
+    let SEASON_ARR;
+    let seasonTag = document.getElementById("data-season");
 
-  let BRAND_ARR;
-  let brandTag = document.getElementById("data-brand");
-
-  let BANNER_ARR;
-  let bannerTag = document.getElementById("data-banner");
-
-  let REVIEW_ARR;
-  let reviewTag = document.getElementById("data-review");
-
-  let NOTICE_ARR;
-  let noticeTag = document.getElementById("data-notice");
-
-  let GOODNEWS_ARR;
-  let goodnewsTag = document.getElementById("data-goodnews");
-
-  let SEASON_ARR;
-  let seasonTag = document.getElementById("data-season");
-
-  // 비주얼 화면 출력 기능
-  function showVisual() {
-    let html = "";
-    VISUAL_ARR.forEach(function (item) {
-      const tag = `
+    // 비주얼 화면 출력 기능
+    function showVisual() {
+        let html = "";
+        VISUAL_ARR.forEach(function (item) {
+            const tag = `
 <div class="swiper-slide">
                 <div class="visual-slide-page">
                   <a href="${item.link}">
@@ -260,83 +281,83 @@ window.onload = function () {
                 </div>
               </div>
 `;
-      html += tag;
-    });
-    visualTag.innerHTML = html;
+            html += tag;
+        });
+        visualTag.innerHTML = html;
 
-    // 비주얼 슬라이드 기능
-    const swVisual = new Swiper(".sw-visual", {
-      loop: true,
-      navigation: {
-        prevEl: ".visual-prev",
-        nextEl: ".visual-next",
-      },
-      autoplay: {
-        delay: 2500,
-        disableOnInteraction: false,
-      },
-      pagination: {
-        el: ".visual-pg",
-        type: "fraction",
-      },
-    });
-    // 비주얼 슬라이드 멈춤 기능
-    const swVisualPlay = document.querySelector(".visual-play");
-    swVisualPlay.addEventListener("click", function () {
-      // 현재 active 클래스가 있는지 없는지 판단하고
-      // 기능을 설정한다.
-      if (swVisualPlay.classList.contains("active")) {
-        // 새로 시작
-        swVisual.autoplay.start();
-        swVisualPlay.classList.remove("active");
-      } else {
-        swVisual.autoplay.stop();
-        swVisualPlay.classList.add("active");
-      }
-    });
-  }
+        // 비주얼 슬라이드 기능
+        const swVisual = new Swiper(".sw-visual", {
+            loop: true,
+            navigation: {
+                prevEl: ".visual-prev",
+                nextEl: ".visual-next",
+            },
+            autoplay: {
+                delay: 2500,
+                disableOnInteraction: false,
+            },
+            pagination: {
+                el: ".visual-pg",
+                type: "fraction",
+            },
+        });
+        // 비주얼 슬라이드 멈춤 기능
+        const swVisualPlay = document.querySelector(".visual-play");
+        swVisualPlay.addEventListener("click", function () {
+            // 현재 active 클래스가 있는지 없는지 판단하고
+            // 기능을 설정한다.
+            if (swVisualPlay.classList.contains("active")) {
+                // 새로 시작
+                swVisual.autoplay.start();
+                swVisualPlay.classList.remove("active");
+            } else {
+                swVisual.autoplay.stop();
+                swVisualPlay.classList.add("active");
+            }
+        });
+    }
 
-  // 오늘의 상품 화면 출력 기능
-  function showTodayGood() {
-    // console.log(TODAY_GOOD);
-    let htmlTop = "";
-    let htmlBottom = "";
-    //     TODAY_GOOD.forEach(function (item) {
-    //       // console.log(item);
-    //       let tag = `
-    // <div class="good-box">
-    //               <!-- 제품이미지 -->
-    //               <a href="${item.link}" class="good-img">
-    //                 <img src="images/${item.pic}" alt="${item.name}" />
-    //                 <span class="good-type">${item.tag}</span>
-    //               </a>
-    //               <!-- 제품정보 -->
-    //               <a href="${item.link}" class="good-info">
-    //                 <em>${item.name}</em>(<em>${item.unit}</em>)
-    //               </a>
-    //               <!-- 제품가격 -->
-    //               <a href="${item.link}" class="good-info-price">${item.price}<em>원</em></a>
-    //               <!-- 장바구니 -->
-    //               <button class="good-add-cart"></button>
-    //             </div>
-    // `;
-    //       // console.log(tag);
-    //       // htmk = html + tag;
-    //       html += tag;
-    //     });
-    // console.log(html);
+    // 오늘의 상품 화면 출력 기능
+    function showTodayGood() {
+        // console.log(TODAY_GOOD);
+        let htmlTop = "";
+        let htmlBottom = "";
+        //     TODAY_GOOD.forEach(function (item) {
+        //       // console.log(item);
+        //       let tag = `
+        // <div class="good-box">
+        //               <!-- 제품이미지 -->
+        //               <a href="${item.link}" class="good-img">
+        //                 <img src="images/${item.pic}" alt="${item.name}" />
+        //                 <span class="good-type">${item.tag}</span>
+        //               </a>
+        //               <!-- 제품정보 -->
+        //               <a href="${item.link}" class="good-info">
+        //                 <em>${item.name}</em>(<em>${item.unit}</em>)
+        //               </a>
+        //               <!-- 제품가격 -->
+        //               <a href="${item.link}" class="good-info-price">${item.price}<em>원</em></a>
+        //               <!-- 장바구니 -->
+        //               <button class="good-add-cart"></button>
+        //             </div>
+        // `;
+        //       // console.log(tag);
+        //       // htmk = html + tag;
+        //       html += tag;
+        //     });
+        // console.log(html);
 
-    // 조건에 맞는 배열 만들기
-    // 인덱스 0~3 까지 배열만들기
-    const topArr = TODAY_GOOD.filter(function (item, index) {
-      // console.log(item,index);
-      if (index < 4) {
-        return item;
-      }
-    });
-    // console.log(topArr);
-    topArr.forEach(function (item) {
-      let tag = `
+        // 조건에 맞는 배열 만들기
+        // 인덱스 0~3 까지 배열만들기
+        const topArr = TODAY_GOOD.filter(function (item, index) {
+            // console.log(item,index);
+            if (index < 4) {
+                return item;
+            }
+        });
+        // console.log(topArr);
+        topArr.forEach(function (item) {
+            let tag = `
 <div class="good-box">
               <!-- 제품이미지 -->
               <a href="${item.link}" class="good-img">
@@ -349,27 +370,27 @@ window.onload = function () {
               </a>
               <!-- 제품가격 -->
               <a href="${item.link}" class="good-info-price">${priceToString(
-        item.price
-      )}<em>원</em></a>
+                item.price
+            )}<em>원</em></a>
               <!-- 장바구니 -->
               <button class="good-add-cart"></button>
             </div>
 `;
 
-      htmlTop += tag;
-    });
+            htmlTop += tag;
+        });
 
-    // 인덱스 4~7 까지 배열만들기
-    const botArr = TODAY_GOOD.filter(function (item, index) {
-      // console.log(item,index);
-      if (index > 3) {
-        return item;
-      }
-    });
-    // console.log(bottomArr);
+        // 인덱스 4~7 까지 배열만들기
+        const botArr = TODAY_GOOD.filter(function (item, index) {
+            // console.log(item,index);
+            if (index > 3) {
+                return item;
+            }
+        });
+        // console.log(bottomArr);
 
-    botArr.forEach(function (item) {
-      let tag = `
+        botArr.forEach(function (item) {
+            let tag = `
 <div class="good-box">
             <!-- 제품이미지 -->
             <a href="${item.link}" class="good-img">
@@ -382,29 +403,29 @@ window.onload = function () {
             </a>
             <!-- 제품가격 -->
             <a href="${item.link}" class="good-info-price">${priceToString(
-        item.price
-      )}<em>원</em></a>
+                item.price
+            )}<em>원</em></a>
             <!-- 장바구니 -->
             <button class="good-add-cart"></button>
           </div>
 `;
 
-      htmlBottom += tag;
-    });
+            htmlBottom += tag;
+        });
 
-    todayTag.innerHTML = htmlTop;
-    todayTag2.innerHTML = htmlBottom;
-  }
+        todayTag.innerHTML = htmlTop;
+        todayTag2.innerHTML = htmlBottom;
+    }
 
-  // 알뜰 상픔 화면 출력 기능
-  function showSaleGood() {
-    let html = `
+    // 알뜰 상픔 화면 출력 기능
+    function showSaleGood() {
+        let html = `
     <div class="swiper sw-sale">
     <div class="swiper-wrapper">
     `;
 
-    SALE_GOOD.forEach(function (item) {
-      let tag = `
+        SALE_GOOD.forEach(function (item) {
+            let tag = `
       <div class="swiper-slide">
           <div class="good-box">
             <!-- 제품이미지 -->
@@ -418,42 +439,42 @@ window.onload = function () {
             </a>
             <!-- 제품가격 -->
             <a href="${item.link}" class="good-info-price">${priceToString(
-        item.price
-      )}<em>원</em></a>
+                item.price
+            )}<em>원</em></a>
             <!-- 장바구니 -->
             <button class="good-add-cart"></button>
           </div>
       </div>
 `;
 
-      html += tag;
-    });
-    html += `
+            html += tag;
+        });
+        html += `
     </div>
     </div>
     `;
-    saleTag.innerHTML = html;
+        saleTag.innerHTML = html;
 
-    const swSale = new Swiper(".sw-sale", {
-      slidesPerView: 3,
-      spaceBetween: 16,
-      slidesPerGroup: 3,
-      navigation: {
-        prevEl: ".sale .slide-prev",
-        nextEl: ".sale .slide-next",
-      },
-      pagination: {
-        el: ".sale .slide-pg",
-        type: "fraction",
-      },
-    });
-  }
+        const swSale = new Swiper(".sw-sale", {
+            slidesPerView: 3,
+            spaceBetween: 16,
+            slidesPerGroup: 3,
+            navigation: {
+                prevEl: ".sale .slide-prev",
+                nextEl: ".sale .slide-next",
+            },
+            pagination: {
+                el: ".sale .slide-pg",
+                type: "fraction",
+            },
+        });
+    }
 
-  // 신상품 화면 출력 기능
-  function showNewGood() {
-    // 첫번째 출력 자료
-    let obj = NEW_GOOD[0];
-    let newGoodFirst = `
+    // 신상품 화면 출력 기능
+    function showNewGood() {
+        // 첫번째 출력 자료
+        let obj = NEW_GOOD[0];
+        let newGoodFirst = `
 <a href="${obj.link}" class="new-img">
 <img src="images/${obj.pic}" alt="${obj.title}" />
 </a>
@@ -464,15 +485,15 @@ window.onload = function () {
 >${obj.txt}</a
 >
 `;
-    newTag.innerHTML = newGoodFirst;
+        newTag.innerHTML = newGoodFirst;
 
-    //  나머지 출력 1~4번
-    let html = "";
-    NEW_GOOD.forEach(function (item, index) {
-      let tag = "";
-      // 0 번은 출력했으므로
-      if (index !== 0) {
-        tag = `
+        //  나머지 출력 1~4번
+        let html = "";
+        NEW_GOOD.forEach(function (item, index) {
+            let tag = "";
+            // 0 번은 출력했으므로
+            if (index !== 0) {
+                tag = `
     <div class="new-box">
                 <a href="${item.link}" class="new-box-img">
                   <img src="images/${item.pic}" alt="${item.title}" />
@@ -482,20 +503,20 @@ window.onload = function () {
                 </a>
               </div>
     `;
-      }
-      html += tag;
-    });
-    newListTag.innerHTML = html;
-  }
+            }
+            html += tag;
+        });
+        newListTag.innerHTML = html;
+    }
 
-  // 추천 상품 화면 출력 기능
-  function showRecommendGood() {
-    let html = `
+    // 추천 상품 화면 출력 기능
+    function showRecommendGood() {
+        let html = `
     <div class="swiper sw-recommend">
     <div class="swiper-wrapper">
     `;
-    RECOMMEND_GOOD.forEach(function (item) {
-      let tag = `
+        RECOMMEND_GOOD.forEach(function (item) {
+            let tag = `
       <div class="swiper-slide">
         <div class="good-box">
         <!-- 제품이미지 -->
@@ -509,46 +530,46 @@ window.onload = function () {
         </a>
         <!-- 제품가격 -->
         <a href="${item.link}" class="good-info-price">${priceToString(
-        item.price
-      )}<em>원</em></a>
+                item.price
+            )}<em>원</em></a>
         <!-- 장바구니 -->
         <button class="good-add-cart"></button>
         </div>
       </div>
         `;
 
-      html += tag;
-    });
-    html += `
+            html += tag;
+        });
+        html += `
 </div>
 </div>
 `;
-    recommendTag.innerHTML = html;
+        recommendTag.innerHTML = html;
 
-    const swRecommend = new Swiper(".sw-recommend", {
-      slidesPerView: 3,
-      spaceBetween: 16,
-      slidesPerGroup: 3,
-      navigation: {
-        prevEl: ".recommend .slide-prev",
-        nextEl: ".recommend .slide-next",
-      },
-      pagination: {
-        el: ".recommend .slide-pg",
-        type: "fraction",
-      },
-    });
-  }
+        const swRecommend = new Swiper(".sw-recommend", {
+            slidesPerView: 3,
+            spaceBetween: 16,
+            slidesPerGroup: 3,
+            navigation: {
+                prevEl: ".recommend .slide-prev",
+                nextEl: ".recommend .slide-next",
+            },
+            pagination: {
+                el: ".recommend .slide-pg",
+                type: "fraction",
+            },
+        });
+    }
 
-  // 인기 상품 아이콘 출력 기능
-  function showPopularIconGood() {
-    let html = `
+    // 인기 상품 아이콘 출력 기능
+    function showPopularIconGood() {
+        let html = `
       <div class="swiper sw-icon">
         <div class="swiper-wrapper">
     `;
-    // 데이터처리
-    POPULAR_ICON.forEach(function (item) {
-      const tag = `
+        // 데이터처리
+        POPULAR_ICON.forEach(function (item) {
+            const tag = `
         <div class="swiper-slide">
           <a href="${item.link}">
             <span
@@ -563,80 +584,80 @@ window.onload = function () {
         </div>
       `;
 
-      html += tag;
-    });
+            html += tag;
+        });
 
-    html += `
+        html += `
         </div>
       </div>
     `;
 
-    // html 이 화면에 배치하고 나야 js로 참조할 수있다.
-    popularIconTag.innerHTML = html;
+        // html 이 화면에 배치하고 나야 js로 참조할 수있다.
+        popularIconTag.innerHTML = html;
 
-    const swIcon = new Swiper(".sw-icon", {
-      slidesPerView: 7,
-      slidesPerGroup: 7,
-      spaceBetween: 10,
-      navigation: {
-        nextEl: ".popular-slide-next",
-        prevEl: ".popular-slide-prev",
-      },
-    });
-    // html에 배치가 되었으면 찾을 수 있다.
-    // a 태그 14개를 찾아야 하는데 그래서
-    // querySelector가 아닌 querySelectorAll 이용함.
-    // querySelectorAll은 배열 즉 []를 리턴한다.
+        const swIcon = new Swiper(".sw-icon", {
+            slidesPerView: 7,
+            slidesPerGroup: 7,
+            spaceBetween: 10,
+            navigation: {
+                nextEl: ".popular-slide-next",
+                prevEl: ".popular-slide-prev",
+            },
+        });
+        // html에 배치가 되었으면 찾을 수 있다.
+        // a 태그 14개를 찾아야 하는데 그래서
+        // querySelector가 아닌 querySelectorAll 이용함.
+        // querySelectorAll은 배열 즉 []를 리턴한다.
 
-    const tag = document.querySelectorAll(".popular-slide a");
-    // 찾아서 저장을 한 배열의 각 a 태그에 기능을 준다.
-    // forEach가 for 문 보다 적용하기가 수월하다.
+        const tag = document.querySelectorAll(".popular-slide a");
+        // 찾아서 저장을 한 배열의 각 a 태그에 기능을 준다.
+        // forEach가 for 문 보다 적용하기가 수월하다.
 
-    tag.forEach(function (item, index) {
-      // 현재 item에는 a태그가 하나씩 순차적으로 대입된다.
-      // mouseover, mouseout 을 콜백 적용한다.
-      item.addEventListener("mouseover", function () {
-        // a 태그의 내부의 아이콘 클래스 즉, popular-cate-icon 찾는다.
-        const spanTag = this.querySelector(".popular-cate-icon");
-        // style 변경한다.
-        spanTag.style.backgroundPositionY = "-64px";
-      });
-      item.addEventListener("mouseout", function () {
-        // a 태그의 내부의 아이콘 클래스 즉, popular-cate-icon 찾는다.
+        tag.forEach(function (item, index) {
+            // 현재 item에는 a태그가 하나씩 순차적으로 대입된다.
+            // mouseover, mouseout 을 콜백 적용한다.
+            item.addEventListener("mouseover", function () {
+                // a 태그의 내부의 아이콘 클래스 즉, popular-cate-icon 찾는다.
+                const spanTag = this.querySelector(".popular-cate-icon");
+                // style 변경한다.
+                spanTag.style.backgroundPositionY = "-64px";
+            });
+            item.addEventListener("mouseout", function () {
+                // a 태그의 내부의 아이콘 클래스 즉, popular-cate-icon 찾는다.
 
-        const spanTag = this.querySelector(".popular-cate-icon");
-        // style 변경한다.
+                const spanTag = this.querySelector(".popular-cate-icon");
+                // style 변경한다.
 
-        spanTag.style.backgroundPositionY = "0px";
-      });
+                spanTag.style.backgroundPositionY = "0px";
+            });
 
-      // 클릭을 하면 버튼(.popular-more)의 글자를
-      // 클릭된 타이틀의 글자로 변경한다.
-      item.addEventListener("click", function (event) {
-        // a 태그 이므로 href가 적용된다.
-        // 웹브라우저 갱신되므로 UI를 위해 막아야 한다.
-        event.preventDefault();
-        const bt = document.querySelector(".popular-more");
-        const title = this.querySelector(".popular-cate-name");
-        bt.innerHTML = `${title.innerHTML} 물품 더보기`;
-        // bt.innerHTML = title.innerHTML + " 물품 더보기";
+            // 클릭을 하면 버튼(.popular-more)의 글자를
+            // 클릭된 타이틀의 글자로 변경한다.
+            item.addEventListener("click", function (event) {
+                // a 태그 이므로 href가 적용된다.
+                // 웹브라우저 갱신되므로 UI를 위해 막아야 한다.
+                event.preventDefault();
+                const bt = document.querySelector(".popular-more");
+                const title = this.querySelector(".popular-cate-name");
+                bt.innerHTML = `${title.innerHTML} 물품 더보기`;
+                // bt.innerHTML = title.innerHTML + " 물품 더보기";
 
-        // 하단의 목록을 갱신한다.
-        // 현재 클릭된 번호를 popularshowdp 에 담는다.
-        popularshow = index;
-        showPopularGood();
-      });
-    });
-  }
+                // 하단의 목록을 갱신한다.
+                // 현재 클릭된 번호를 popularshowdp 에 담는다.
+                popularshow = index;
+                showPopularGood();
+            });
+        });
+    }
 
-  // 인기 상품 화면 출력 기능
-  function showPopularGood() {
-    let html = "";
-    let popCate = "populargood-" + (popularshow + 1);
-    console.log(POPULAR_GOOD[popCate]);
+    // 인기 상품 화면 출력 기능
+    function showPopularGood() {
+        let html = "";
+        let popCate = "populargood-" + (popularshow + 1);
+        console.log(POPULAR_GOOD[popCate]);
 
-    POPULAR_GOOD[popCate].forEach(function (item) {
-      let tag = `
+        POPULAR_GOOD[popCate].forEach(function (item) {
+            let tag = `
       <div class="good-box">
               <!-- 제품이미지 -->
               <a href="${item.link}" class="good-img">
@@ -649,26 +670,26 @@ window.onload = function () {
               </a>
               <!-- 제품가격 -->
               <a href="${item.link}" class="good-info-price">${priceToString(
-        item.price
-      )}<em>원</em></a>
+                item.price
+            )}<em>원</em></a>
               <!-- 장바구니 -->
               <button class="good-add-cart"></button>
             </div>
       `;
-      html += tag;
-    });
-    popularTag.innerHTML = html;
-  }
+            html += tag;
+        });
+        popularTag.innerHTML = html;
+    }
 
-  // 브랜드 목록 화면 출력 기능
-  function showBrandArr() {
-    let html = `
+    // 브랜드 목록 화면 출력 기능
+    function showBrandArr() {
+        let html = `
     <div class="swiper sw-brand">
     <div class="swiper-wrapper">
     `;
 
-    BRAND_ARR.forEach(function (item) {
-      let tag = `
+        BRAND_ARR.forEach(function (item) {
+            let tag = `
       <div class="swiper-slide">
         <div class="brand-box">
           <a href="${item.link}">
@@ -688,77 +709,77 @@ window.onload = function () {
         </div>
       </div>
       `;
-      html += tag;
-    });
-    html += `
+            html += tag;
+        });
+        html += `
     </div>
     </div>
     `;
 
-    brandTag.innerHTML = html;
+        brandTag.innerHTML = html;
 
-    const swBrand = new Swiper(".sw-brand", {
-      slidesPerView: 3,
-      spaceBetween: 16,
-      navigation: {
-        prevEl: ".brand .slide-prev",
-        nextEl: ".brand .slide-next",
-      },
-      pagination: {
-        el: ".brand .slide-pg",
-        type: "fraction",
-      },
-    });
-  }
+        const swBrand = new Swiper(".sw-brand", {
+            slidesPerView: 3,
+            spaceBetween: 16,
+            navigation: {
+                prevEl: ".brand .slide-prev",
+                nextEl: ".brand .slide-next",
+            },
+            pagination: {
+                el: ".brand .slide-pg",
+                type: "fraction",
+            },
+        });
+    }
 
-  // 배너 목록 화면 출력 기능
-  function showBannerArr() {
-    let html = `
+    // 배너 목록 화면 출력 기능
+    function showBannerArr() {
+        let html = `
     <div class="swiper sw-banner">
     <div class="swiper-wrapper">
     `;
 
-    BANNER_ARR.forEach(function (item) {
-      let tag = `
+        BANNER_ARR.forEach(function (item) {
+            let tag = `
       <div class="swiper-slide">
       <a href="${item.link}">
               <img src="images/${item.image}" alt="${item.title}" />
             </a>
       </div>     
 `;
-      html += tag;
-    });
+            html += tag;
+        });
 
-    html += `
+        html += `
     </div>
     </div>
     `;
-    bannerTag.innerHTML = html;
+        bannerTag.innerHTML = html;
 
-    const swBanner = new Swiper(".sw-banner", {
-      loop: true,
-      autoplay: {
-        delay: 2500,
-        disableOnInteraction: false,
-      },
-      slidesPerView: 2,
-      spaceBetween: 0,
-      navigation: {
-        prevEl: ".banner .slide-prev",
-        nextEl: ".banner .slide-next",
-      },
-    });
-  }
+        const swBanner = new Swiper(".sw-banner", {
+            loop: true,
+            autoplay: {
+                delay: 2500,
+                disableOnInteraction: false,
+            },
+            slidesPerView: 2,
+            spaceBetween: 0,
+            navigation: {
+                prevEl: ".banner .slide-prev",
+                nextEl: ".banner .slide-next",
+            },
+        });
+    }
 
-  // 리뷰 화면 출력기능
-  function showReview() {
-    let html = `
+    // 리뷰 화면 출력기능
+    function showReview() {
+        let html = `
     <div class="swiper sw-review">
     <div class="swiper-wrapper">
     `;
-    // 데이터 처리
-    REVIEW_ARR.forEach(function (item) {
-      const tag = `
+        // 데이터 처리
+        REVIEW_ARR.forEach(function (item) {
+            const tag = `
       <div class="swiper-slide">
         <div class="review-box">
                   <a href="${item.link}">
@@ -779,36 +800,36 @@ window.onload = function () {
         </div>
       </div>
       `;
-      html += tag;
-    });
-    html += `
+            html += tag;
+        });
+        html += `
     </div>
     </div>
     `;
-    reviewTag.innerHTML = html;
+        reviewTag.innerHTML = html;
 
-    const swReview = new Swiper(".sw-review", {
-      slidesPerView: 3,
-      spaceBetween: 16,
-      slidesPerGroup: 3,
-      navigation: {
-        prevEl: ".review .slide-prev",
-        nextEl: ".review .slide-next",
-      },
-      pagination: {
-        el: ".review .slide-pg",
-        type: "fraction",
-      },
-    });
-  }
+        const swReview = new Swiper(".sw-review", {
+            slidesPerView: 3,
+            spaceBetween: 16,
+            slidesPerGroup: 3,
+            navigation: {
+                prevEl: ".review .slide-prev",
+                nextEl: ".review .slide-next",
+            },
+            pagination: {
+                el: ".review .slide-pg",
+                type: "fraction",
+            },
+        });
+    }
 
-  // 공지사항 화면 출력기능
-  function showNotice() {
-    let html = "";
-    // 데이터 갱신
+    // 공지사항 화면 출력기능
+    function showNotice() {
+        let html = "";
+        // 데이터 갱신
 
-    NOTICE_ARR.forEach(function (item) {
-      const tag = `
+        NOTICE_ARR.forEach(function (item) {
+            const tag = `
       <li>
       <a href="${item.link}"
         ><span>
@@ -817,18 +838,18 @@ window.onload = function () {
       >
     </li>
 `;
-      html += tag;
-    });
-    noticeTag.innerHTML += html;
-  }
+            html += tag;
+        });
+        noticeTag.innerHTML += html;
+    }
 
-  // 물품소식 화면 출력기능
-  function showGoodnews() {
-    let html = "";
+    // 물품소식 화면 출력기능
+    function showGoodnews() {
+        let html = "";
 
-    // 데이터 처리
-    GOODNEWS_ARR.forEach(function (item) {
-      const tag = `
+        // 데이터 처리
+        GOODNEWS_ARR.forEach(function (item) {
+            const tag = `
   <li>
                     <a href="${item.link}"
                     ><span>${item.title}</span
@@ -836,21 +857,21 @@ window.onload = function () {
                     >
                   </li>
   `;
-      html += tag;
-    });
-    goodnewsTag.innerHTML = html;
-  }
+            html += tag;
+        });
+        goodnewsTag.innerHTML = html;
+    }
 
-  // 시즌 화면 출력기능
-  const buyTotal = document.getElementById("buy-total");
-  const buyTotalMoney = document.getElementById("buy-total-money");
-  let buyTotalCount = 0;
-  let buyTotalMoneyPrice = 0;
+    // 시즌 화면 출력기능
+    const buyTotal = document.getElementById("buy-total");
+    const buyTotalMoney = document.getElementById("buy-total-money");
+    let buyTotalCount = 0;
+    let buyTotalMoneyPrice = 0;
 
-  function showSeason() {
-    let html = "";
-    SEASON_ARR.forEach(function (item, index) {
-      const tag = `
+    function showSeason() {
+        let html = "";
+        SEASON_ARR.forEach(function (item, index) {
+            const tag = `
       <li>
         <div class="season-good clearfix">
           <input
@@ -867,271 +888,271 @@ window.onload = function () {
           <p class="season-good-info">
             <a href="${item.link}" class="season-good-title">${item.title}</a>
             <a href="${
-              item.link
+                item.link
             }" class="season-good-price"><em>${priceToString(
-        item.price
-      )}</em>원</a>
+                item.price
+            )}</em>원</a>
           </p>
         </div>
       </li>
       `;
-      html += tag;
-    });
-    seasonTag.innerHTML = html;
+            html += tag;
+        });
+        seasonTag.innerHTML = html;
 
-    // Smooth Scrollbar 적용
-    Scrollbar.initAll();
-    // 체크 박스 각각의 기능
-    checkBoxFn();
-    // 계산 출력하라.
-    showBuyGood();
-  }
-  // 전체 체크박스 기능
-  const chkAll = document.getElementById("chall");
-  chkAll.addEventListener("change", function () {
-    const chkArr = document.querySelectorAll(".season-item");
-    if (chkAll.checked) {
-      // 전체 체크를 해야 하는 경우
-      chkArr.forEach(function (item) {
-        item.checked = true;
-      });
-    } else {
-      // 전체 체크를 해제 해야 하는 경우
-      chkArr.forEach(function (item) {
-        item.checked = false;
-      });
-    }
-    showBuyGood();
-  });
-
-  // 체크박스 각각의 기능
-  function checkBoxFn() {
-    const chkArr = document.querySelectorAll(".season-item");
-    chkArr.forEach(function (item) {
-      item.addEventListener("change", function () {
-        // 가격을 다시 계산한다.
+        // Smooth Scrollbar 적용
+        Scrollbar.initAll();
+        // 체크 박스 각각의 기능
+        checkBoxFn();
+        // 계산 출력하라.
         showBuyGood();
-      });
-    });
-  }
-
-  // 계산 출력 기능
-  function showBuyGood() {
-    // 체크가 된 카운팅을 한다. 그리고 더한다.
-    let count = 0;
-    let priceTotal = 0;
-    const chkArr = document.querySelectorAll(".season-item");
-    chkArr.forEach(function (item) {
-      const state = item.checked;
-      if (state) {
-        // count = count + 1;
-        count += 1;
-        // count ++;
-
-        // 글자를 정수 숫자로 변경함.
-        const price = parseInt(item.value);
-        // priceTotal = priceTotal + price;
-        priceTotal += price;
-      }
-    });
-    buyTotalCount = count;
-    buyTotalMoneyPrice = priceTotal;
-    
-    buyTotal.innerHTML = buyTotalCount;
-    buyTotalMoney.innerHTML = priceToString(buyTotalMoneyPrice);
-
-    // 전체 선택 버튼 해제
-    if (buyTotalCount === chkArr.length) {
-      // 전체 체크 버튼 checked 되어야 함.
-      chkAll.checked = true;
-    } else {
-      // 전체 체크 버튼 checked  해제되어야 함.
-      chkAll.checked = false;
     }
-  }
-
-  // data.json 을 로딩
-  const xhttp = new XMLHttpRequest();
-  // 파일이 모두 불러들여졌는지 검사하고
-  // State:Response 불러들이고 있는 상태
-  xhttp.onreadystatechange = function (event) {
-    const req = event.target;
-    // console.log(req);
-    if (req.readyState === XMLHttpRequest.DONE) {
-      // 불러온 데이터 확인해 보다.
-      // 글자 즉 ""로 전달이 된다.
-      const str = req.response;
-      // console.log(str);
-      // console.log(typeof str);
-
-      // 글자로 온 데이터를 객체로 변환
-      // 글가자 json 규칙대로 만들어진 문자열이다.
-      // 그러므로 json 글자를 객체!!!!!!!!로 변환하여서 활용한다.
-      let obj = JSON.parse(str);
-      // console.log(obj)
-      // console.log(typeof obj)
-
-      VISUAL_ARR = obj.visual;
-      TODAY_GOOD = obj.todaygood;
-      SALE_GOOD = obj.salegood;
-      NEW_GOOD = obj.newgood;
-      RECOMMEND_GOOD = obj.recommendgood;
-      POPULAR_ICON = obj.popularicon;
-      POPULAR_GOOD = obj.populargood;
-      BRAND_ARR = obj.brandarr;
-      BANNER_ARR = obj.bannerarr;
-      REVIEW_ARR = obj.review;
-      NOTICE_ARR = obj.notice;
-      GOODNEWS_ARR = obj.goodnews;
-      SEASON_ARR = obj.season;
-
-      // 비주얼 화면에 배치한다.
-      showVisual();
-      // 오늘의 상품을 화면에 배치한다.
-      showTodayGood();
-      // 할인 상품을 화면에 배치한다.
-      showSaleGood();
-      // 신상품을 화면에 배치한다.
-      showNewGood();
-      // 추천 상품을 화면에 배치한다.
-      showRecommendGood();
-      // 인기 아이콘을 화면에 배치한다.
-      showPopularIconGood();
-      // 인기 상품을 화면에 배치한다.
-      showPopularGood();
-      // 브랜드 목록을 화면에 배치한다.
-      showBrandArr();
-      // 배너 목록을 화면에 배치한다.
-      showBannerArr();
-      // 리뷰 목록을 화면에 배치한다.
-      showReview();
-      // 공지사항 목록을 화면에 배치한다.
-      showNotice();
-      // 물품소식 목록을 화면에 배치한다.
-      showGoodnews();
-      // 시즌 목록을 화면에 배치한다.
-      showSeason();
-    }
-  };
-
-  // 자료를 호출한다
-  console.log("자료를 가져온다. XMLHT.....");
-
-  xhttp.open("GET", "data.json");
-  // 웹브라우저 기능 실행 요청
-  xhttp.send();
-
-  // 커뮤니티 탭 메뉴
-  // 탭 버튼
-  const tabBtArr = document.querySelectorAll(".community-bt");
-  // 탭 내용
-  const tabConArr = document.querySelectorAll(".community-notice dd");
-  // 탭 포커스
-  let tabFocusIndex = 0;
-  // 탭 버튼 클릭 처리
-  tabBtArr.forEach(function (item, index) {
-    item.addEventListener("click", function () {
-      tabFocusIndex = index;
-      tabFocusFn();
-    });
-  });
-  // 탭 포커스 함수를 생성
-  function tabFocusFn() {
-    // 포커스 css 를 적용 및 제거
-    // 일단 모두 제거
-    tabBtArr.forEach(function (item) {
-      item.classList.remove("community-bt-active");
-    });
-    // 인덱스에 해당하는 것만 적용.
-    tabBtArr[tabFocusIndex].classList.add("community-bt-active");
-    // 내용에서 일단 모두 제거
-    tabConArr.forEach(function (item) {
-      item.classList.remove("community-visible-active");
-    });
-    tabConArr[tabFocusIndex].classList.add("community-visible-active");
-  }
-
-  // 스크롤시 상단 고정 클래스 추가/제거
-  const wrap = document.querySelector(".wrap");
-  const header = document.querySelector(".header");
-  let scy = 0;
-
-  window.addEventListener("scroll", function () {
-    scy = this.document.documentElement.scrollTop;
-
-    if (scy > 0) {
-      wrap.classList.add("active");
-      header.classList.add("active");
-    } else {
-      wrap.classList.remove("active");
-      header.classList.remove("active");
-    }
-  });
-
-  // 하단 패밀리 펼침 기능
-  // 목록 열기 버튼
-  const openBt = document.querySelector(".footer-link");
-  // 목록 닫기 버튼
-  const closeBt = document.querySelector(".family-close");
-  // 보여질 패밀리 목록
-  const family = document.querySelector(".family");
-  // 스크롤바를 안생기게 하려고 처리
-  const community = document.querySelector(".community");
-  // 기능처리
-  openBt.addEventListener("click", function () {
-    family.classList.add("active");
-    this.classList.add("active");
-    community.classList.add("active");
-  });
-  closeBt.addEventListener("click", function () {
-    family.classList.remove("active");
-    openBt.classList.remove("active");
-    community.classList.remove("active");
-  });
-
-  // niceScroll 적용 :jQuery 버전
-  // const sgl = $(".season-good-list");
-  // sgl.niceScroll({
-  //   cursorwidth: "8px",
-  //   cursoropacitymax: 0.5,
-  // });
-
-  // sgl.mouseover(function () {
-  //   sgl.getNiceScroll().resize();
-  // });
-
-  // 전체 메뉴 펼침 기능
-  const allMenuArea = document.querySelector(".all-menu-area");
-  const allMenu = document.querySelector(".all-menu");
-  const cateList = document.querySelector(".cate-list");
-  const themeList = document.querySelector(".theme-list");
-
-  allMenuArea.addEventListener("mouseleave", function () {
-    allMenu.classList.remove("active");
-  });
-
-  cateList.addEventListener("mouseenter", function () {
-    allMenu.classList.add("active");
-  });
-  // cateList.addEventListener("mouseleave", function () {
-  //   allMenu.classList.remove("active");
-  // });
-  themeList.addEventListener("mouseenter", function () {
-    allMenu.classList.remove("active");
-  });
-
-  // 서브 카테고리 보여주기
-  const cateListLis = document.querySelectorAll(".cate-list > li");
-  const cateDepth2 = document.querySelectorAll(".cate-depth2-list");
-  cateListLis.forEach(function (item, index) {
-    item.addEventListener("mouseenter", function () {
-      cateDepth2.forEach(function (itemSub, indexSub) {
-        itemSub.style.display = "none";
-        if (indexSub === index) {
-          itemSub.style.display = "block";
+    // 전체 체크박스 기능
+    const chkAll = document.getElementById("chall");
+    chkAll.addEventListener("change", function () {
+        const chkArr = document.querySelectorAll(".season-item");
+        if (chkAll.checked) {
+            // 전체 체크를 해야 하는 경우
+            chkArr.forEach(function (item) {
+                item.checked = true;
+            });
+        } else {
+            // 전체 체크를 해제 해야 하는 경우
+            chkArr.forEach(function (item) {
+                item.checked = false;
+            });
         }
-      });
-      console.log(index);
+        showBuyGood();
     });
-  });
+
+    // 체크박스 각각의 기능
+    function checkBoxFn() {
+        const chkArr = document.querySelectorAll(".season-item");
+        chkArr.forEach(function (item) {
+            item.addEventListener("change", function () {
+                // 가격을 다시 계산한다.
+                showBuyGood();
+            });
+        });
+    }
+
+    // 계산 출력 기능
+    function showBuyGood() {
+        // 체크가 된 카운팅을 한다. 그리고 더한다.
+        let count = 0;
+        let priceTotal = 0;
+        const chkArr = document.querySelectorAll(".season-item");
+        chkArr.forEach(function (item) {
+            const state = item.checked;
+            if (state) {
+                // count = count + 1;
+                count += 1;
+                // count ++;
+
+                // 글자를 정수 숫자로 변경함.
+                const price = parseInt(item.value);
+                // priceTotal = priceTotal + price;
+                priceTotal += price;
+            }
+        });
+        buyTotalCount = count;
+        buyTotalMoneyPrice = priceTotal;
+
+        buyTotal.innerHTML = buyTotalCount;
+        buyTotalMoney.innerHTML = priceToString(buyTotalMoneyPrice);
+
+        // 전체 선택 버튼 해제
+        if (buyTotalCount === chkArr.length) {
+            // 전체 체크 버튼 checked 되어야 함.
+            chkAll.checked = true;
+        } else {
+            // 전체 체크 버튼 checked  해제되어야 함.
+            chkAll.checked = false;
+        }
+    }
+
+    // data.json 을 로딩
+    const xhttp = new XMLHttpRequest();
+    // 파일이 모두 불러들여졌는지 검사하고
+    // State:Response 불러들이고 있는 상태
+    xhttp.onreadystatechange = function (event) {
+        const req = event.target;
+        // console.log(req);
+        if (req.readyState === XMLHttpRequest.DONE) {
+            // 불러온 데이터 확인해 보다.
+            // 글자 즉 ""로 전달이 된다.
+            const str = req.response;
+            // console.log(str);
+            // console.log(typeof str);
+
+            // 글자로 온 데이터를 객체로 변환
+            // 글가자 json 규칙대로 만들어진 문자열이다.
+            // 그러므로 json 글자를 객체!!!!!!!!로 변환하여서 활용한다.
+            let obj = JSON.parse(str);
+            // console.log(obj)
+            // console.log(typeof obj)
+
+            VISUAL_ARR = obj.visual;
+            TODAY_GOOD = obj.todaygood;
+            SALE_GOOD = obj.salegood;
+            NEW_GOOD = obj.newgood;
+            RECOMMEND_GOOD = obj.recommendgood;
+            POPULAR_ICON = obj.popularicon;
+            POPULAR_GOOD = obj.populargood;
+            BRAND_ARR = obj.brandarr;
+            BANNER_ARR = obj.bannerarr;
+            REVIEW_ARR = obj.review;
+            NOTICE_ARR = obj.notice;
+            GOODNEWS_ARR = obj.goodnews;
+            SEASON_ARR = obj.season;
+
+            // 비주얼 화면에 배치한다.
+            showVisual();
+            // 오늘의 상품을 화면에 배치한다.
+            showTodayGood();
+            // 할인 상품을 화면에 배치한다.
+            showSaleGood();
+            // 신상품을 화면에 배치한다.
+            showNewGood();
+            // 추천 상품을 화면에 배치한다.
+            showRecommendGood();
+            // 인기 아이콘을 화면에 배치한다.
+            showPopularIconGood();
+            // 인기 상품을 화면에 배치한다.
+            showPopularGood();
+            // 브랜드 목록을 화면에 배치한다.
+            showBrandArr();
+            // 배너 목록을 화면에 배치한다.
+            showBannerArr();
+            // 리뷰 목록을 화면에 배치한다.
+            showReview();
+            // 공지사항 목록을 화면에 배치한다.
+            showNotice();
+            // 물품소식 목록을 화면에 배치한다.
+            showGoodnews();
+            // 시즌 목록을 화면에 배치한다.
+            showSeason();
+        }
+    };
+
+    // 자료를 호출한다
+    console.log("자료를 가져온다. XMLHT.....");
+
+    xhttp.open("GET", "data.json");
+    // 웹브라우저 기능 실행 요청
+    xhttp.send();
+
+    // 커뮤니티 탭 메뉴
+    // 탭 버튼
+    const tabBtArr = document.querySelectorAll(".community-bt");
+    // 탭 내용
+    const tabConArr = document.querySelectorAll(".community-notice dd");
+    // 탭 포커스
+    let tabFocusIndex = 0;
+    // 탭 버튼 클릭 처리
+    tabBtArr.forEach(function (item, index) {
+        item.addEventListener("click", function () {
+            tabFocusIndex = index;
+            tabFocusFn();
+        });
+    });
+    // 탭 포커스 함수를 생성
+    function tabFocusFn() {
+        // 포커스 css 를 적용 및 제거
+        // 일단 모두 제거
+        tabBtArr.forEach(function (item) {
+            item.classList.remove("community-bt-active");
+        });
+        // 인덱스에 해당하는 것만 적용.
+        tabBtArr[tabFocusIndex].classList.add("community-bt-active");
+        // 내용에서 일단 모두 제거
+        tabConArr.forEach(function (item) {
+            item.classList.remove("community-visible-active");
+        });
+        tabConArr[tabFocusIndex].classList.add("community-visible-active");
+    }
+
+    // 스크롤시 상단 고정 클래스 추가/제거
+    const wrap = document.querySelector(".wrap");
+    const header = document.querySelector(".header");
+    let scy = 0;
+
+    window.addEventListener("scroll", function () {
+        scy = this.document.documentElement.scrollTop;
+
+        if (scy > 0) {
+            wrap.classList.add("active");
+            header.classList.add("active");
+        } else {
+            wrap.classList.remove("active");
+            header.classList.remove("active");
+        }
+    });
+
+    // 하단 패밀리 펼침 기능
+    // 목록 열기 버튼
+    const openBt = document.querySelector(".footer-link");
+    // 목록 닫기 버튼
+    const closeBt = document.querySelector(".family-close");
+    // 보여질 패밀리 목록
+    const family = document.querySelector(".family");
+    // 스크롤바를 안생기게 하려고 처리
+    const community = document.querySelector(".community");
+    // 기능처리
+    openBt.addEventListener("click", function () {
+        family.classList.add("active");
+        this.classList.add("active");
+        community.classList.add("active");
+    });
+    closeBt.addEventListener("click", function () {
+        family.classList.remove("active");
+        openBt.classList.remove("active");
+        community.classList.remove("active");
+    });
+
+    // niceScroll 적용 :jQuery 버전
+    // const sgl = $(".season-good-list");
+    // sgl.niceScroll({
+    //   cursorwidth: "8px",
+    //   cursoropacitymax: 0.5,
+    // });
+
+    // sgl.mouseover(function () {
+    //   sgl.getNiceScroll().resize();
+    // });
+
+    // 전체 메뉴 펼침 기능
+    const allMenuArea = document.querySelector(".all-menu-area");
+    const allMenu = document.querySelector(".all-menu");
+    const cateList = document.querySelector(".cate-list");
+    const themeList = document.querySelector(".theme-list");
+
+    allMenuArea.addEventListener("mouseleave", function () {
+        allMenu.classList.remove("active");
+    });
+
+    cateList.addEventListener("mouseenter", function () {
+        allMenu.classList.add("active");
+    });
+    // cateList.addEventListener("mouseleave", function () {
+    //   allMenu.classList.remove("active");
+    // });
+    themeList.addEventListener("mouseenter", function () {
+        allMenu.classList.remove("active");
+    });
+
+    // 서브 카테고리 보여주기
+    const cateListLis = document.querySelectorAll(".cate-list > li");
+    const cateDepth2 = document.querySelectorAll(".cate-depth2-list");
+    cateListLis.forEach(function (item, index) {
+        item.addEventListener("mouseenter", function () {
+            cateDepth2.forEach(function (itemSub, indexSub) {
+                itemSub.style.display = "none";
+                if (indexSub === index) {
+                    itemSub.style.display = "block";
+                }
+            });
+            console.log(index);
+        });
+    });
 };
